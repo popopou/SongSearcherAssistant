@@ -1,0 +1,99 @@
+apply plugin: 'com.android.application'
+apply plugin: 'jacoco-android'
+
+jacoco {
+    toolVersion = "0.8.3"
+}
+
+tasks.withType(Test) {
+    jacoco.includeNoLocationClasses = true
+}
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion '29.0.2'
+    defaultConfig {
+        applicationId "zsx.com.songsearchassistant"
+        minSdkVersion 21
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0.1"
+        testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [
+                        'androidManifestFile': 'app\\build\\intermediates\\merged_manifests\\debug\\AndroidManifest.xml'
+                ]
+            }
+        }
+    }
+/*    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }*/
+//    javaCompileOptions {
+//        annotationProcessorOptions {
+//            arguments = [
+//                    'resourcePackageName': "zsx.com.musicnionsearch",
+//                    "androidManifestFile": "MusicUnionSearch-master/app/src/main/AndroidManifest.xml".toString()
+//            ]
+//        }
+//    }
+
+    signingConfigs {
+        release {
+            storeFile file("../android.keystore")
+            storePassword project.hasProperty("STORE_PASSWORD") ? STORE_PASSWORD : System.getenv("STORE_PASSWORD")
+            keyAlias project.hasProperty("STORE_ALIAS_NAME") ? STORE_ALIAS_NAME : System.getenv("STORE_ALIAS_NAME")
+            keyPassword project.hasProperty("STORE_KEY_PASSWORD") ? STORE_KEY_PASSWORD : System.getenv("STORE_KEY_PASSWORD")
+        }
+    }
+    buildTypes {
+        debug {
+            testCoverageEnabled true
+        }
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+}
+
+def AAVersion = '4.6.0'
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    //noinspection GradleCompatible
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    annotationProcessor "org.androidannotations:androidannotations:$AAVersion"
+    implementation "org.androidannotations:androidannotations-api:$AAVersion"
+    implementation 'com.squareup.okhttp3:okhttp:4.2.2'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    //noinspection GradleCompatible
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
+    implementation 'com.mpatric:mp3agic:0.9.1'
+    implementation 'com.leon:lfilepickerlibrary:1.8.0'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test:rules:1.0.2'
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    androidTestImplementation('com.android.support.test.espresso:espresso-contrib:3.0.2', {
+        exclude group: 'com.android.support', module: 'appcompat'
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude module: 'recyclerview-v7'
+    })
+    androidTestImplementation 'com.android.support.test.espresso:espresso-intents:3.0.2'
+    androidTestImplementation 'com.android.support.test.uiautomator:uiautomator-v18:2.1.3'
+}
+
+tasks.withType(Test) {
+    jacoco.includeNoLocationClasses = true
+    jacoco.excludes = ['jdk.internal.*']
+}
